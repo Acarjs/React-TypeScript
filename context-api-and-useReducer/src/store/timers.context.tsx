@@ -35,7 +35,10 @@ export default function TimersContextProvider({
       //...
     },
     stopTimers() {},
-  };
+  },
+    test(){
+    
+  }
 
   return (
     <TimersContext.Provider value={ctx}>{children}</TimersContext.Provider>
