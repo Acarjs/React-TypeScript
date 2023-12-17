@@ -18,7 +18,7 @@ export default function Timer({ name, duration }: TimerProps) {
     }, 50);
     internal.current = timer;
 
-    return () => clearInterval(timer); //if it returns something, it should be a function. This will a cleanup function that's automatically called by React right before this useEffect function runs again or at least right before the component unmounts.
+    return () => clearInterval(timer); //if it returns something, it should be a function. This will be a cleanup function that's automatically called by React right before this useEffect function runs again(in this case it will run only once) or at least right before the component unmounts. So before the component is removed from the DOM.
   }, []);
 
   let formattedRemainingTime = +(remainingTime / 1000).toFixed(2);
