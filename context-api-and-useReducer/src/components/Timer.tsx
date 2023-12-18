@@ -1,33 +1,47 @@
 import { useEffect, useState, useRef } from 'react';
 import Container from './UI/Container.tsx';
-import { type Timer as TimerProps } from '../store/timers.context.tsx';
+import {
+  useTimersContext,
+  type Timer as TimerProps,
+} from '../store/timers.context.tsx';
 
 export default function Timer({ name, duration }: TimerProps) {
-  const internal = useRef<number | null>(null); //this will hold "timer" reference. This ref will hold initially a null value but eventually receive a number. Refs won't get created whenever this component function runs again.
-  console.log(internal);
+  const interval = useRef<number | null>(null); //this will hold "timer" reference. This ref will hold initially a null value but eventually receive a number. Refs won't get created whenever this component function runs again.
 
   const [remainingTime, setRemainingTime] = useState(duration * 1000);
 
-  if (remainingTime <= 0 && internal.current) {
-    clearInterval(internal.current);
+  const { isRunning } = useTimersContext();
+
+  if (remainingTime <= 0 && interval.current) {
+    clearInterval(interval.current);
   }
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prevTime) => prevTime - 50);
-    }, 50);
-    internal.current = timer;
+    let timer: number;
+    if (isRunning) {
+      timer = setInterval(function () {
+        setRemainingTime((prevTime) => {
+          if (prevTime <= 0) {
+            return prevTime;
+          }
+          return prevTime - 50;
+        });
+      }, 50);
+      interval.current = timer;
+    } else if (interval.current) {
+      clearInterval(interval.current);
+    }
 
     return () => clearInterval(timer); //if it returns something, it should be a function. This will be a cleanup function that's automatically called by React right before this useEffect function runs again(in this case it will run only once) or at least right before the component unmounts. So before the component is removed from the DOM.
-  }, []);
+  }, [isRunning]);
 
-  let formattedRemainingTime = +(remainingTime / 1000).toFixed(2);
+  let formattedRemainingTime = (remainingTime / 1000).toFixed(2);
 
   return (
     <Container as="article">
       <h2>{name}</h2>
       <p>
-        <progress max={duration * 100} value={remainingTime} />
+        <progress max={duration * 1000} value={remainingTime} />
       </p>
       <p>{formattedRemainingTime}</p>
     </Container>
