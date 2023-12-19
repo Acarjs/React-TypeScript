@@ -1,4 +1,5 @@
 export async function get(url: string) {
+  //async will unsure that this function wraps any data that you might be returning into a promise.
   const response = await fetch(url); // that will an object which created by browser.
 
   if (!response.ok) {
